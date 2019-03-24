@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -74,6 +74,13 @@ class PersistentDrawerLeft extends React.Component {
     this.state = {
       open: false
     };
+
+    this.routes = this.props.routes;
+    if (this.routes == undefined)
+      this.routes = [];
+
+    this.redirect = this.redirect.bind(this);
+    console.log(this.history);
   };
 
   handleDrawerOpen = () => {
@@ -86,6 +93,7 @@ class PersistentDrawerLeft extends React.Component {
 
   render() {
     const { open } = this.state;
+    let token = localStorage.getItem(this.props.tknKey);
 
     return (
       <div className={this.classes.root}>
@@ -98,9 +106,9 @@ class PersistentDrawerLeft extends React.Component {
         >
           <Material.Toolbar disableGutters={!open}>
             <Material.IconButton
-              color="inherit"
-              aria-label="Open drawer"
-              onClick={this.handleDrawerOpen}
+                color="inherit"
+                aria-label="Open drawer"
+                onClick={this.handleDrawerOpen}
               className={classNames(this.classes.menuButton, open && this.classes.hide)}
             >
               <Icons.Menu />
@@ -126,14 +134,16 @@ class PersistentDrawerLeft extends React.Component {
           </div>
           <Material.Divider />
           <Material.List>
-            <Material.ListItem button key="">
-              <Material.ListItemIcon><Icons.List /></Material.ListItemIcon>
-              <Material.ListItemText primary="Lectures" />
-            </Material.ListItem>
-            <Material.ListItem button key="">
-              <Material.ListItemIcon><Icons.Group /></Material.ListItemIcon>
-              <Material.ListItemText primary="Students" />
-            </Material.ListItem>
+            {
+              this.routes.map((obj, ind) => (
+                <Material.Link component={RouterLink} to={obj.route} style={{ textDecoration: 'none' }}>
+                  <Material.ListItem button key={obj.title} >
+                    <Material.ListItemIcon>{obj.icon}</Material.ListItemIcon>
+                    <Material.ListItemText primary={obj.title} />
+                  </Material.ListItem>
+                </Material.Link>
+                ))
+            }
           </Material.List>
         </Material.Drawer>
         <main
@@ -146,6 +156,10 @@ class PersistentDrawerLeft extends React.Component {
         </main>
       </div>
     );
+  }
+
+  redirect(e) {
+    
   }
 }
 

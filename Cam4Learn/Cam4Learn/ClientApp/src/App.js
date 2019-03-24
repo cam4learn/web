@@ -1,27 +1,39 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-
-import Main from './components/Main';
-import NotFound from './components/NotFound';
-import Login from './components/Login';
-import Lectures from './components/Lectures';
-import Students from './components/Students';
-import Export from './components/Export';
-
-import * as Material from '@material-ui/core';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import PersistentDrawer from './components/PersistentDrawer';
+import Main from './components/Routing/Main';
+import NotFound from './components/Routing/NotFound';
+import Login from './components/Routing/Login';
+import Lectures from './components/Routing/Lectures';
+import Students from './components/Routing/Students';
+import Export from './components/Routing/Export';
+
+import * as Icons from '@material-ui/icons';
 
 export default class App extends Component {
   displayName = App.name
 
   constructor(props) {
     super(props);
+
+    this.menuRoutes = [
+      {
+        title: "Lectures",
+        icon: <Icons.List />,
+        route: "/lectures"
+      },
+      {
+        title: "Students",
+        icon: <Icons.Group />,
+        route: "/student"
+      }
+    ];
   }
 
   render() {
     return (
       <BrowserRouter basename={this.props.basename}>
-        <PersistentDrawer heading="Cam4Study">
+        <PersistentDrawer heading="Cam4Study" routes={this.menuRoutes}>
           <Switch>
             <Route exact path="/" component={Main} />
             <Route exact path="/login" component={Login} />

@@ -22,8 +22,8 @@ const theme = createMuiTheme({
     }
 });
 
-const axios = require('axios');
-const axiosInstance = axios.create({
+var axios = require('axios');
+var axiosInstance = axios.create({
   baseURL: 'https://some-domain.com/api/'
 });
 

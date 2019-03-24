@@ -7,12 +7,11 @@ export default class Main extends Component {
   }
 
   render() {
-    var redirect = "/lectures";
-    if (localStorage.getItem("cam4studyTkn") == null)
-      redirect = "/login";
-      
-    return (
-      <Redirect to={redirect} />
-    );
+    let token = localStorage.getItem(this.props.tknKey);
+
+    if (token == null)
+      return (<Redirect to="/login" />);
+    else
+      return (<h1>Main page</h1>);
   }
 }
