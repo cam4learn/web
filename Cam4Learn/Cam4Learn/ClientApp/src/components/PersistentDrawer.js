@@ -6,11 +6,13 @@ import { withStyles } from '@material-ui/core/styles';
 import * as Material from '@material-ui/core';
 import * as Icons from '@material-ui/icons';
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 const styles = theme => ({
   root: {
     display: 'flex',
+    width: `100%`,
+    margin: 0
   },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
@@ -48,6 +50,8 @@ const styles = theme => ({
     justifyContent: 'flex-end',
   },
   content: {
+    display: `flex`,
+    flexDirection: `column`,
     flexGrow: 1,
     padding: theme.spacing.unit * 3,
     transition: theme.transitions.create('margin', {
@@ -136,8 +140,8 @@ class PersistentDrawerLeft extends React.Component {
           <Material.List>
             {
               this.routes.map((obj, ind) => (
-                <Material.Link component={RouterLink} to={obj.route} style={{ textDecoration: 'none' }}>
-                  <Material.ListItem button key={obj.title} >
+                <Material.Link component={RouterLink} to={obj.route} style={{ textDecoration: 'none' }} key={obj.title}>
+                  <Material.ListItem button>
                     <Material.ListItemIcon>{obj.icon}</Material.ListItemIcon>
                     <Material.ListItemText primary={obj.title} />
                   </Material.ListItem>

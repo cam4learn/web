@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
+import { TokenLocalKey } from '../api';
 
 export default class Main extends Component {
   constructor(props) {
@@ -7,7 +8,7 @@ export default class Main extends Component {
   }
 
   render() {
-    let token = localStorage.getItem(this.props.tknKey);
+    let token = localStorage.getItem(TokenLocalKey);
 
     if (token == null)
       return (<Redirect to="/login" />);

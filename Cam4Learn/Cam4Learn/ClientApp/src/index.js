@@ -22,9 +22,4 @@ const theme = createMuiTheme({
     }
 });
 
-var axios = require('axios');
-var axiosInstance = axios.create({
-  baseURL: 'https://some-domain.com/api/'
-});
-
-ReactDOM.render( <App basename={baseUrl} />, rootElement);
+ReactDOM.render(<App basename={baseUrl}/>, rootElement);
