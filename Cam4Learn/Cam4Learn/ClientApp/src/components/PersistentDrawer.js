@@ -6,6 +6,8 @@ import { withStyles } from '@material-ui/core/styles';
 import * as Material from '@material-ui/core';
 import * as Icons from '@material-ui/icons';
 
+import { TokenLocalKey, RoleLocalKey } from './api';
+
 const drawerWidth = 260;
 
 const styles = theme => ({
@@ -67,6 +69,9 @@ const styles = theme => ({
     }),
     marginLeft: 0,
   },
+  grow: {
+    flexGrow: 1,
+  }
 });
 
 class PersistentDrawerLeft extends React.Component {
@@ -76,15 +81,15 @@ class PersistentDrawerLeft extends React.Component {
     this.classes = this.props.classes;
     this.theme = this.props.theme;
     this.state = {
-      open: false
+      open: false,
+      role: this.props.role
     };
 
     this.routes = this.props.routes;
     if (this.routes == undefined)
       this.routes = [];
 
-    this.redirect = this.redirect.bind(this);
-    console.log(this.history);
+    this.logout = this.logout.bind(this);
   };
 
   handleDrawerOpen = () => {
@@ -97,7 +102,8 @@ class PersistentDrawerLeft extends React.Component {
 
   render() {
     const { open } = this.state;
-    let token = localStorage.getItem(this.props.tknKey);
+    let token = localStorage.getItem(TokenLocalKey); 
+    let role = localStorage.getItem(RoleLocalKey) || 'NoneAuth';
 
     return (
       <div className={this.classes.root}>
@@ -120,6 +126,13 @@ class PersistentDrawerLeft extends React.Component {
             <Material.Typography variant="h6" color="inherit" noWrap>
               {this.props.heading}
             </Material.Typography>
+
+            <div className={this.classes.grow} />
+
+            <Material.IconButton onClick={this.logout} color="inherit"
+              className={classNames((this.state.role == null) && this.classes.hide)}>
+              <Icons.ExitToApp />
+            </Material.IconButton>
           </Material.Toolbar>
         </Material.AppBar>
         <Material.Drawer
@@ -139,7 +152,9 @@ class PersistentDrawerLeft extends React.Component {
           <Material.Divider />
           <Material.List>
             {
-              this.routes.map((obj, ind) => (
+              this.routes
+                .filter(obj => obj.role.indexOf(role) != -1)
+                .map((obj, ind) => (
                 <Material.Link component={RouterLink} to={obj.route} style={{ textDecoration: 'none' }} key={obj.title}>
                   <Material.ListItem button>
                     <Material.ListItemIcon>{obj.icon}</Material.ListItemIcon>
@@ -162,8 +177,10 @@ class PersistentDrawerLeft extends React.Component {
     );
   }
 
-  redirect(e) {
-    
+  logout() {
+    localStorage.removeItem(TokenLocalKey);
+    localStorage.removeItem(RoleLocalKey);
+    this.props.authCallback();
   }
 }
 

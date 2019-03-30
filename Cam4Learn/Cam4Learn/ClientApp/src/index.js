@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createMuiTheme } from '@material-ui/core/styles';
 import indigo from '@material-ui/core/colors/indigo';
+import { BrowserRouter } from 'react-router-dom';
 
 import App from './App';
 
@@ -22,4 +23,7 @@ const theme = createMuiTheme({
     }
 });
 
-ReactDOM.render(<App basename={baseUrl}/>, rootElement);
+ReactDOM.render(
+  <BrowserRouter basename={baseUrl}>
+    <App basename={baseUrl} />
+  </BrowserRouter>, rootElement);

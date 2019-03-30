@@ -1,15 +1,21 @@
 ﻿import axios from 'axios';
 
-var url = `https://987f547e.ngrok.io`;
+var url = 'http://104.196.250.21:8030/';
 var tknKey = "cam4learnTkn";
 var roleKey = "cam4learnRole";
 
 export var AuthorizedAxios = axios.create({
   baseURL: url,
-  headers: { 'Authorization': 'Bearer ' + localStorage.getItem(tknKey) }
+  headers: {
+    'JWT': localStorage.getItem(tknKey),
+    'Content-Type': 'application/json',
+  }
 }),
   UnauthorizedAxios = axios.create({
-    baseURL: url
+    baseURL: url,
+    headers: {
+      'Content-Type': 'application/json',
+    }
   }),
   TokenLocalKey = tknKey,
   RoleLocalKey = roleKey;

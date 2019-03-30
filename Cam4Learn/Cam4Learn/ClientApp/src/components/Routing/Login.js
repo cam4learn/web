@@ -69,18 +69,14 @@ class Login extends Component {
     this.state = {
       loginError: false,
       passError: false,
-      role: 'Lecturer',
       login: '',
-      password: ''
+      password: '',
+      showPassword: false
     };
-
-    this.apiRoutes = {
-      'Lecturer': '/login',
-      'Admin': '/adminLogin'
-    }
 
     this.submit = this.submit.bind(this);
     this.loginWithoutAccount = this.loginWithoutAccount.bind(this);
+    this.onChangeInput = this.onChangeInput.bind(this);
   }
 
   render() {
@@ -92,41 +88,47 @@ class Login extends Component {
       return (
         <Material.Grid container direction="column" justify="center" alignItems="center" className={this.classes.flexContainer}>
           <Material.FormControl className={classNames(this.classes.containerWrap, this.classes.w33)} error={this.state.loginError}>
-            <Material.InputLabel htmlFor="component-error">Login</Material.InputLabel>
+            <Material.InputLabel htmlFor="login-input">Login</Material.InputLabel>
             <Material.Input
-              id="component-error"
-              onChange={(e) => this.setState({ login: e.target.value})}
+              id="login-input"
+              onChange={(e) => this.onChangeInput('login', e)}
               aria-describedby="component-error-text"
             />
-            <Material.FormHelperText id="component-error-text"
+            <Material.FormHelperText id="login-input-err"
               className={classNames(this.state.loginError ? this.classes.displayInherit : this.classes.displayNone)}>
               Invalid login
               </Material.FormHelperText>
           </Material.FormControl>
+
           <Material.FormControl className={classNames(this.classes.containerWrap, this.classes.w33)} error={this.state.passError}>
-            <Material.InputLabel htmlFor="component-error">Password</Material.InputLabel>
+            <Material.InputLabel htmlFor="pass-input">Password</Material.InputLabel>
             <Material.Input
-              id="component-error"
-              onChange={(e) => this.setState({ password: e.target.value })}
+              id="pass-input"
+              onChange={(e) => this.onChangeInput('password', e)}
               aria-describedby="component-error-text"
+              type={this.state.showPassword ? 'text' : 'password'}
+              endAdornment={
+                <Material.InputAdornment position="end">
+                  <Material.IconButton
+                    aria-label="Toggle password visibility"
+                    onClick={this.handleClickShowPassword}
+                  >
+                    {this.state.showPassword ? <Icons.Visibility /> : <Icons.VisibilityOff />}
+                  </Material.IconButton>
+                </Material.InputAdornment>
+              }
             />
-            <Material.FormHelperText id="component-error-text"
+            <Material.FormHelperText id="pass-input-err"
               className={classNames(this.state.passError ? this.classes.displayInherit : this.classes.displayNone)}>
               Invalid password
               </Material.FormHelperText>
           </Material.FormControl>
-          <Material.FormControl className={classNames(this.classes.formControl, this.classes.w33)}>
-            <Material.InputLabel htmlFor="age-simple">Role</Material.InputLabel>
-            <Material.Select value={this.state.role} onChange={(e) => this.setState({ role: e.target.value })}>
-              <Material.MenuItem value="Lecturer">Lecturer</Material.MenuItem>
-              <Material.MenuItem value="Admin">Admin</Material.MenuItem>
-            </Material.Select>
-          </Material.FormControl>
+
           <Material.Button variant="contained" color="primary" className={this.classes.button} onClick={this.submit}>
             SUBMIT
           </Material.Button>
           <Material.Button variant="outlined" color="secondary" className={this.classes.button} onClick={this.loginWithoutAccount}>
-            Login Without Account
+            Export Without Account
           </Material.Button>
         </Material.Grid>
         );
@@ -134,24 +136,61 @@ class Login extends Component {
 
   submit(e) {
     e.preventDefault();
-    let role = this.state.role;
-    let url = this.apiRoutes[role];
+    let url = "/adminLogin";
+    let err = false;
 
-    API.post(url, {
-      login: this.state.login,
-      password: this.state.password
-    }).then((response) => {
-      localStorage.setItem(TokenLocalKey, response.data.JWT);
-      localStorage.setItem(RoleLocalKey, role);
-      this.props.history.push(`/lectures`);
-    }).catch((error) => {
-      //TODO: Set state for an errors (this.setState({ loginError: true }); and so on)
-    });
+    if (this.state.login == '') {
+      this.setState({ loginError: true });
+      err = true;
+    }
+
+    if (this.state.password.length < 6) {
+      console.log(this.state.password.length);
+      this.setState({ passError: true });
+      err = true;
+    }
+
+    if (!err) {
+      var data = JSON.stringify({
+        "login": this.state.login,
+        "password": this.state.password
+      });
+      console.log(data);
+      API.post(url, data).then((response) => {
+        localStorage.setItem(TokenLocalKey, response.data.JWT);
+        localStorage.setItem(RoleLocalKey, 'Admin');
+        this.props.authCallback(true);
+        }).catch((error) => {
+          if (error.response) {
+            if (error.response.status == 401) {
+              this.setState({ loginError: true });
+            }
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log('Error', error.message);
+          }
+      });
+    }
+  }
+
+  onChangeInput(field, e) {
+    switch (field) {
+      case 'login':
+        this.setState({ login: e.target.value, loginError: false });
+        break;
+      case 'password':
+        this.setState({ password: e.target.value, passError: false });
+    }
   }
 
   loginWithoutAccount(e) {
     this.props.history.push(`/export`);
   }
+
+  handleClickShowPassword = () => {
+    this.setState(state => ({ showPassword: !state.showPassword }));
+  };
 }
 
 Login.propTypes = {
