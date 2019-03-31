@@ -97,7 +97,7 @@ class Login extends Component {
             <Material.FormHelperText id="login-input-err"
               className={classNames(this.state.loginError ? this.classes.displayInherit : this.classes.displayNone)}>
               Invalid login
-              </Material.FormHelperText>
+            </Material.FormHelperText>
           </Material.FormControl>
 
           <Material.FormControl className={classNames(this.classes.containerWrap, this.classes.w33)} error={this.state.passError}>
@@ -181,6 +181,7 @@ class Login extends Component {
         break;
       case 'password':
         this.setState({ password: e.target.value, passError: false });
+        break;
     }
   }
 

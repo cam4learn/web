@@ -84,6 +84,9 @@ const styles = theme => ({
   foregroundAdd: {
     'color': '#4CAF50'
   },
+  m4: {
+    'margin': '1em'
+  }
 });
 
 class Subjects extends Component {
@@ -95,6 +98,7 @@ class Subjects extends Component {
 
     this.state = {
       data: [],
+      lecturers: [],
       headers: [
         {
           id: 'id',
@@ -127,7 +131,11 @@ class Subjects extends Component {
 
       editAddOpen: false,
       currentEdit: { },
-      isEdit: false
+      isEdit: false,
+      addEditTitle: 'Add subject',
+
+      subjectName: '',
+      lectorId: 0
     }
 
     this.refresh = this.refresh.bind(this);
@@ -139,6 +147,14 @@ class Subjects extends Component {
 
     this.showEdit = this.showEdit.bind(this);
     this.showAdd = this.showAdd.bind(this);
+    this.hideAddEdit = this.hideAddEdit.bind(this);
+    this.addSubject = this.addSubject.bind(this);
+    this.editSubject = this.editSubject.bind(this);
+    this.addEditSubmit = this.addEditSubmit.bind(this);
+
+    this.onChangeInput = this.onChangeInput.bind(this);
+
+    this.refresh();
   }
 
   createRow(obj) {
@@ -153,8 +169,7 @@ class Subjects extends Component {
           <Material.TableCell>
             <Material.Button
             variant="contained"
-            color="secondary"
-            onClick={() => this.showEdit(obj)}>
+            color="secondary">
               Edit
               <Icons.Edit className={this.classes.rightIcon} />
             </Material.Button>
@@ -186,7 +201,7 @@ class Subjects extends Component {
     console.log("deleteSubject");
     console.log(this.state.currentDelete);
     var data = JSON.stringify({
-      "id": this.state.currentDelete.id
+      id: this.state.currentDelete.id
     });
 
     AuthorizedAxios.delete("/api/admin/deleteSubject", data)
@@ -205,31 +220,81 @@ class Subjects extends Component {
   showEdit(obj) {
     console.log("showEdit");
 
-
+    this.setState({
+      addEditTitle: 'Edit subject',
+      isEdit: true,
+      currentEdit: obj,
+      subjectName: obj.title,
+      editAddOpen: true
+    });
   }
 
   showAdd() {
     console.log("showAdd");
-
-
+    this.setState({
+      addEditTitle: 'Add subject',
+      isEdit: false,
+      subjectName: '',
+      editAddOpen: true,
+      lectorId: 0
+    });
   }
 
   hideAddEdit() {
     console.log("hideAddEdit");
+    this.setState({
+      isEdit: false,
+      subjectName: '',
+      editAddOpen: false
+    });
+  }
 
+  addEditSubmit() {
+    console.log("addEditSubmit");
 
+    if (this.state.isEdit) {
+      this.editSubject();
+    }
+    else {
+      this.addSubject();
+    }
   }
 
   addSubject() {
     console.log("addSubject");
+    let data = JSON.stringify({
+      lector: this.state.lectorId,
+      title: this.state.subjectName
+    });
 
+    AuthorizedAxios.post("/api/admin/addSubject", data)
+      .then(response => {
+        console.log("Refresh");
+        console.log(response);
+        this.setState({ data: response.data });
+      }).catch(error => {
+        console.log(error);
+      });
 
+    this.hideAddEdit();
   }
 
   editSubject() {
     console.log("editSubject");
+    
 
+    this.hideAddEdit();
+  }
 
+  onChangeInput(name, e) {
+    switch (name) {
+      case 'subjectName':
+        this.setState({ subjectName: e.target.value });
+        break;
+      case 'lecturer':
+        this.setState({ lectorId: e.target.value });
+        break;
+    }
   }
 
   refresh() {
@@ -239,6 +304,15 @@ class Subjects extends Component {
         console.log("Refresh");
         console.log(response);
         this.setState({ data: response.data });
+
+        AuthorizedAxios.get("/api/lectors")
+          .then(resp => {
+            console.log("Lectors");
+            console.log(resp);
+            this.setState({ lecturers: response.data });
+            console.log(this.state.lecturers);
+          })
+
       }).catch(error => {
         console.log(error);
       });
@@ -310,36 +384,55 @@ class Subjects extends Component {
           <Material.Dialog
             fullScreen={fullScreen}
             open={this.state.editAddOpen}
-            onClose={this.hi}
+            onClose={this.hideAddEdit}
             aria-labelledby="responsive-dialog-title">
 
             <Material.DialogTitle id="responsive-dialog-title">
-              {"Subject delete"}
+              {this.state.addEditTitle}
             </Material.DialogTitle>
 
-            <Material.DialogContent>
-              <Material.DialogContentText>
-                {"Are you sure you want to delete this subject?"}
-              </Material.DialogContentText>
+            <Material.DialogContent className={this.classes.flexContainer}>
+              <Material.FormControl className={this.classes.m4}>
+                <Material.InputLabel htmlFor="subject-name-input">Subject name</Material.InputLabel>
+                <Material.Input
+                  id="subject-name-input"
+                  value={this.state.subjectName}
+                  onChange={(e) => this.onChangeInput('subjectName', e)}
+                />
+              </Material.FormControl>
+
+              <Material.FormControl className={this.classes.m4}>
+                <Material.InputLabel htmlFor="lecturer-input">Lecturer</Material.InputLabel>
+                <Material.Select
+                  id="lecturer-input"
+                  value={this.state.lectorId}
+                  onChange={(e) => this.onChangeInput('lecturer', e)}>
+                  {
+                    this.state.lecturers.map((obj) => {
+                      return (
+                        <Material.MenuItem key={obj.id} value={obj.id}>
+                          {obj.name + " " + obj.surname}
+                        </Material.MenuItem>
+                        )
+                    })
+                  }
+                </Material.Select>
+              </Material.FormControl>
             </Material.DialogContent>
             <Material.DialogActions>
-              <Material.Button onClick={this.hideDelete}>
+              <Material.Button onClick={this.hideAddEdit}>
                 Cancel
               </Material.Button>
               <Material.Button
-                onClick={this.deleteSubject}
+                onClick={this.addEditSubmit}
                 className={this.classes.foregroundDanger}
                 autoFocus>
-                Delete
+                Submit
               </Material.Button>
             </Material.DialogActions>
           </Material.Dialog>
         </Material.Grid>
         );
-  }
-
-  componentDidMount() {
-    this.refresh();
   }
 }
 
