@@ -145,7 +145,6 @@ class Login extends Component {
     }
 
     if (this.state.password.length < 6) {
-      console.log(this.state.password.length);
       this.setState({ passError: true });
       err = true;
     }
@@ -155,7 +154,6 @@ class Login extends Component {
         "login": this.state.login,
         "password": this.state.password
       });
-      console.log(data);
       API.post(url, data).then((response) => {
         localStorage.setItem(TokenLocalKey, response.data.JWT);
         localStorage.setItem(RoleLocalKey, 'Admin');

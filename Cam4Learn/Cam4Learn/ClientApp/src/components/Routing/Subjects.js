@@ -204,7 +204,7 @@ class Subjects extends Component {
       id: this.state.currentDelete.id
     });
 
-    AuthorizedAxios.delete("/api/admin/deleteSubject", data)
+    AuthorizedAxios.delete("/api/admin/deleteSubject", { data: data })
       .then(response => {
         console.log(response.data);
         this.refresh();
@@ -271,12 +271,11 @@ class Subjects extends Component {
       .then(response => {
         console.log("Refresh");
         console.log(response);
-        this.setState({ data: response.data });
+        this.hideAddEdit();
+        this.refresh();
       }).catch(error => {
         console.log(error);
       });
-
-    this.hideAddEdit();
   }
 
   editSubject() {
@@ -309,7 +308,7 @@ class Subjects extends Component {
           .then(resp => {
             console.log("Lectors");
             console.log(resp);
-            this.setState({ lecturers: response.data });
+            this.setState({ lecturers: resp.data });
             console.log(this.state.lecturers);
           })
 
@@ -409,6 +408,8 @@ class Subjects extends Component {
                   onChange={(e) => this.onChangeInput('lecturer', e)}>
                   {
                     this.state.lecturers.map((obj) => {
+                      console.log("Render lects");
+                      console.log(obj);
                       return (
                         <Material.MenuItem key={obj.id} value={obj.id}>
                           {obj.name + " " + obj.surname}
