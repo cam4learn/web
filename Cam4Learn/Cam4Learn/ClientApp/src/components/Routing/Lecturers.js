@@ -1,10 +1,11 @@
 ﻿import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import * as Icons from '@material-ui/icons';
 import * as Material from '@material-ui/core';
-import { AuthorizedAxios } from '../api';
+import { TokenLocalKey, AuthorizedAxios } from '../api';
 
 const styles = theme => ({
   button: {
@@ -33,7 +34,8 @@ const styles = theme => ({
   }
 });
 
-class Export extends Component {
+
+class Lecturers extends Component {
   constructor(props) {
     super(props);
 
@@ -42,16 +44,21 @@ class Export extends Component {
   }
 
   render() {
-    return (
-      <Material.Grid container direction="column" justify="center" alignItems="center" className={this.classes.flexContainer}>
-        Work in progress
-      </Material.Grid>
-    );
+    let token = localStorage.getItem(TokenLocalKey);
+
+    if (token == null)
+      return (<Redirect to="/login" />);
+    else
+      return (
+        <Material.Grid container direction="column" justify="center" alignItems="center" className={this.classes.flexContainer}>
+          Work in progress
+        </Material.Grid>
+        );
   }
 }
 
-Export.propTypes = {
+Lecturers.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Export);
+export default withStyles(styles)(Lecturers);

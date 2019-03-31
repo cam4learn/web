@@ -1,0 +1,350 @@
+﻿import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import { withStyles } from '@material-ui/core/styles';
+import { Redirect } from 'react-router-dom';
+import * as Icons from '@material-ui/icons';
+import * as Material from '@material-ui/core';
+import { TokenLocalKey, AuthorizedAxios } from '../api';
+
+import EditRemoveTable from '../EditRemoveTable';
+
+const styles = theme => ({
+  button: {
+    margin: theme.spacing.unit,
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit,
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+    minWidth: 120,
+  },
+  flexContainer: {
+    'display': [['flex'], '!important'],
+    'flex-direction': [['column'], '!important'],
+    'flex-grow': [[1], '!important'],
+  },
+  containerWrap: {
+    'display': [['flex'], '!important'],
+    'flex-wrap': [['wrap'], '!important'],
+    'margin-top': [['0.5rem'], '!important'],
+    'margin-bottom': [['0.5rem'], '!important']
+  },
+  displayNone: {
+    'display': [['none'], '!important']
+  },
+  displayInherit: {
+    'display': [['inherit'], '!important']
+  },
+
+  table: {
+    marginLeft: theme.spacing.unit * 6,
+    marginRight: theme.spacing.unit * 6
+  },
+  '@media (min-width: 576px)': {
+    table: {
+      marginLeft: theme.spacing.unit,
+      marginRight: theme.spacing.unit
+    }
+  },
+  '@media (min-width: 768px)': {
+    table: {
+      marginLeft: theme.spacing.unit * 2,
+      marginRight: theme.spacing.unit * 2
+    }
+  },
+  '@media (min-width: 992px)': {
+    table: {
+      marginLeft: theme.spacing.unit * 3,
+      marginRight: theme.spacing.unit * 3
+    }
+  },
+  '@media (min-width: 1200px)': {
+    table: {
+      marginLeft: theme.spacing.unit * 6,
+      marginRight: theme.spacing.unit * 6
+    }
+  },
+  danger: {
+    'background-color': '#F44336',
+    '&:hover': {
+      'background-color': '#D32F2F'
+    }
+  },
+  add: {
+    'background-color': '#4CAF50',
+    '&:hover': {
+      'background-color': '#388E3C'
+    }
+  },
+  foregroundDanger: {
+    'color': '#F44336'
+  },
+  foregroundAdd: {
+    'color': '#4CAF50'
+  },
+});
+
+class Subjects extends Component {
+  constructor(props) {
+    super(props);
+
+    this.classes = this.props.classes;
+    this.theme = this.props.theme;
+
+    this.state = {
+      data: [],
+      headers: [
+        {
+          id: 'id',
+          numeric: true,
+          disablePadding: false,
+          label: 'Subject Id'
+        },
+        {
+          id: 'name',
+          numeric: false,
+          disablePadding: false,
+          label: 'Name'
+        },
+        {
+          id: 'editBtn',
+          numeric: false,
+          disablePadding: false,
+          label: 'Edit',
+        },
+        {
+          id: 'deleteBtn',
+          numeric: false,
+          disablePadding: false,
+          label: 'Delete'
+        }
+      ],
+
+      deleteOpen: false,
+      currentDelete: { },
+
+      editAddOpen: false,
+      currentEdit: { },
+      isEdit: false
+    }
+
+    this.refresh = this.refresh.bind(this);
+    this.createRow = this.createRow.bind(this);
+
+    this.showDelete = this.showDelete.bind(this);
+    this.hideDelete = this.hideDelete.bind(this);
+    this.deleteSubject = this.deleteSubject.bind(this);
+
+    this.showEdit = this.showEdit.bind(this);
+    this.showAdd = this.showAdd.bind(this);
+  }
+
+  createRow(obj) {
+    console.log("Create row");
+    console.log(obj);
+    return (
+        <Material.TableRow hover tabIndex={-1} key={obj.id}>
+          <Material.TableCell component="th" scope="row">
+            {obj.id}
+          </Material.TableCell>
+          <Material.TableCell>{obj.title}</Material.TableCell>
+          <Material.TableCell>
+            <Material.Button
+            variant="contained"
+            color="secondary"
+            onClick={() => this.showEdit(obj)}>
+              Edit
+              <Icons.Edit className={this.classes.rightIcon} />
+            </Material.Button>
+          </Material.TableCell>
+          <Material.TableCell>
+            <Material.Button
+            variant="contained"
+            className={classNames(this.classes.danger)}
+            onClick={() => this.showDelete(obj)}>
+              Delete
+              <Icons.Delete className={this.classes.rightIcon} />
+            </Material.Button>
+          </Material.TableCell>
+        </Material.TableRow>
+      );
+  }
+
+  showDelete(obj) {
+    console.log("showDelete");
+    this.setState({ deleteOpen: true, currentDelete: obj });
+  }
+
+  hideDelete() {
+    console.log("hideDelete");
+    this.setState({ deleteOpen: false, currentDelete: {} });
+  }
+
+  deleteSubject() {
+    console.log("deleteSubject");
+    console.log(this.state.currentDelete);
+    var data = JSON.stringify({
+      "id": this.state.currentDelete.id
+    });
+
+    AuthorizedAxios.delete("/api/admin/deleteSubject", data)
+      .then(response => {
+        console.log(response.data);
+        this.refresh();
+      })
+      .catch(error => {
+        console.log(error);
+      })
+      .then(() => {
+        this.hideDelete();
+      });
+  }
+
+  showEdit(obj) {
+    console.log("showEdit");
+
+
+  }
+
+  showAdd() {
+    console.log("showAdd");
+
+
+  }
+
+  hideAddEdit() {
+    console.log("hideAddEdit");
+
+
+  }
+
+  addSubject() {
+    console.log("addSubject");
+
+
+  }
+
+  editSubject() {
+    console.log("editSubject");
+
+
+  }
+
+  refresh() {
+    console.log("refresh");
+    AuthorizedAxios.get("/api/admin/getSubjects")
+      .then(response => {
+        console.log("Refresh");
+        console.log(response);
+        this.setState({ data: response.data });
+      }).catch(error => {
+        console.log(error);
+      });
+  }
+
+  render() {
+    const { fullScreen } = this.props;
+
+    let token = localStorage.getItem(TokenLocalKey);
+
+    if (token == null)
+      return (<Redirect to="/login" />);
+    else
+      return (
+        <Material.Grid container direction="column" justify="center" alignItems="center" className={this.classes.flexContainer}>
+          <Material.Grid className={classNames(this.classes.table)}>
+            <Material.Grid container direction="row" justify="space-between" alignItems="flex-end">
+              <Material.Button
+                variant="contained"
+                onClick={this.refresh}>
+                Refresh
+                <Icons.Refresh className={this.classes.rightIcon} />
+              </Material.Button>
+              <Material.Button
+                variant="contained"
+                className={classNames(this.classes.add)}
+                onClick={this.showAdd}>
+                Add
+              <Icons.Add className={this.classes.rightIcon} />
+              </Material.Button>
+            </Material.Grid>
+
+            <EditRemoveTable
+              headers={this.state.headers}
+              data={this.state.data}
+              title="Subjects"
+              createRow={this.createRow}
+            />
+          </Material.Grid>
+
+          <Material.Dialog
+            fullScreen={fullScreen}
+            open={this.state.deleteOpen}
+            onClose={this.hideDelete}
+            aria-labelledby="responsive-dialog-title">
+
+            <Material.DialogTitle id="responsive-dialog-title">
+              {"Subject delete"}
+            </Material.DialogTitle>
+
+            <Material.DialogContent>
+              <Material.DialogContentText>
+                {"Are you sure you want to delete this subject?"}
+              </Material.DialogContentText>
+            </Material.DialogContent>
+            <Material.DialogActions>
+              <Material.Button onClick={this.hideDelete}>
+                Cancel
+              </Material.Button>
+              <Material.Button
+                onClick={this.deleteSubject}
+                className={this.classes.foregroundDanger}
+                autoFocus>
+                Delete
+              </Material.Button>
+            </Material.DialogActions>
+          </Material.Dialog>
+
+          <Material.Dialog
+            fullScreen={fullScreen}
+            open={this.state.editAddOpen}
+            onClose={this.hi}
+            aria-labelledby="responsive-dialog-title">
+
+            <Material.DialogTitle id="responsive-dialog-title">
+              {"Subject delete"}
+            </Material.DialogTitle>
+
+            <Material.DialogContent>
+              <Material.DialogContentText>
+                {"Are you sure you want to delete this subject?"}
+              </Material.DialogContentText>
+            </Material.DialogContent>
+            <Material.DialogActions>
+              <Material.Button onClick={this.hideDelete}>
+                Cancel
+              </Material.Button>
+              <Material.Button
+                onClick={this.deleteSubject}
+                className={this.classes.foregroundDanger}
+                autoFocus>
+                Delete
+              </Material.Button>
+            </Material.DialogActions>
+          </Material.Dialog>
+        </Material.Grid>
+        );
+  }
+
+  componentDidMount() {
+    this.refresh();
+  }
+}
+
+Subjects.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(Subjects);

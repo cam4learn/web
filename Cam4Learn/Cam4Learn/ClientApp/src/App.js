@@ -4,8 +4,8 @@ import PersistentDrawer from './components/PersistentDrawer';
 import Main from './components/Routing/Main';
 import NotFound from './components/Routing/NotFound';
 import Login from './components/Routing/Login';
-import Lectures from './components/Routing/Lectures';
-import Students from './components/Routing/Students';
+import Lecturers from './components/Routing/Lecturers';
+import Subjects from './components/Routing/Subjects';
 import Export from './components/Routing/Export';
 
 import * as Icons from '@material-ui/icons';
@@ -22,19 +22,19 @@ export default class App extends Component {
       {
         title: "Subjects",
         icon: <Icons.LibraryBooks />,
-        route: "/lectures",
+        route: "/subjects",
         role: ['Admin']
       },
       {
-        title: "Teachers",
+        title: "Lecturers",
         icon: <Icons.SupervisedUserCircle />,
-        route: "/lectures",
+        route: "/lecturers",
         role: ['Admin']
       },
       {
         title: "Export",
         icon: <Icons.ImportExport />,
-        route: "/students",
+        route: "/export",
         role: ['Admin', 'NoneAuth']
       }
     ];
@@ -59,7 +59,7 @@ export default class App extends Component {
       }
       else {
         return (
-          <Redirect to="/lectures" />
+          <Redirect to="/lecturers" />
         );
       }
     }
@@ -73,8 +73,8 @@ export default class App extends Component {
         <Switch>
           <Route exact path="/" component={Main} />
           <Route exact path="/login" render={(props) => <Login {...props} authCallback={this.authChange} />} />
-          <Route exact path="/lectures" component={Lectures} />
-          <Route exact path="/students" component={Students} />
+          <Route exact path="/lecturers" component={Lecturers} />
+          <Route exact path="/subjects" component={Subjects} />
           <Route exact path="/export" component={Export} />
           <Route component={NotFound} />
         </Switch>

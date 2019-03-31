@@ -34,7 +34,7 @@ const styles = theme => ({
     'display': [['inherit'], '!important']
   },
   w33: {
-    'width': [['33%'], '!important'],
+    'width': [['86%'], '!important'],
   },
   '@media (min-width: 576px)': {
     w33: {
@@ -162,7 +162,7 @@ class Login extends Component {
         this.props.authCallback(true);
         }).catch((error) => {
           if (error.response) {
-            if (error.response.status == 401) {
+            if (error.response.status == 400) {
               this.setState({ loginError: true });
             }
           } else if (error.request) {
