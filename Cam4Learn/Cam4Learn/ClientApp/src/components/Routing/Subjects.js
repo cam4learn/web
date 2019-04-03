@@ -7,7 +7,7 @@ import * as Icons from '@material-ui/icons';
 import * as Material from '@material-ui/core';
 import { TokenLocalKey, AuthorizedAxios } from '../api';
 
-import EditRemoveTable from '../EditRemoveTable';
+import CustomizableTable from '../CustomizableTable';
 
 const styles = theme => ({
   button: {
@@ -344,7 +344,7 @@ class Subjects extends Component {
               </Material.Button>
             </Material.Grid>
 
-            <EditRemoveTable
+            <CustomizableTable
               headers={this.state.headers}
               data={this.state.data}
               title="Subjects"

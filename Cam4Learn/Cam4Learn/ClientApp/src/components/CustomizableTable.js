@@ -6,6 +6,23 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 import * as Material from '@material-ui/core';
 import * as Icons from '@material-ui/icons';
 
+/*
+ *            TABLE GUIDE
+ * To create table, you need 4 things:
+ * 1. Array of header-objects of the table that will be displayed on top. 
+ * Structure:
+ *    {
+ *      id: 'string',   --- Id of field
+ *      numeric: true / false   --- If it's numeric, it can be sorted (in table)
+ *      disablePadding: true / false   --- JUST enter false for normal use
+ *      label: 'string'  --- Label in header
+ *    }
+ * 2. Array of appropriate data (use Axios, see in Subjects page)
+ * 3. Title of table (string)
+ * 4. Function (callback) that takes object and returns React markup (render of 1 row)
+ * 
+ */
+
 const styles = theme => ({
   root: {
     width: '100%',
@@ -43,7 +60,7 @@ function getSorting(order, orderBy) {
   return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
 }
 
-class EnhancedTableHead extends React.Component {
+class CustomizableTableHead extends React.Component {
   createSortHandler = property => event => {
     this.props.onRequestSort(event, property);
   };
@@ -94,7 +111,7 @@ class EnhancedTableHead extends React.Component {
   }
 }
 
-EnhancedTableHead.propTypes = {
+CustomizableTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
@@ -126,7 +143,7 @@ const toolbarStyles = theme => ({
   },
 });
 
-let EnhancedTableToolbar = props => {
+let CustomizableTableToolbar = props => {
   const { classes, title } = props;
 
   return (
@@ -141,13 +158,13 @@ let EnhancedTableToolbar = props => {
   );
 };
 
-EnhancedTableToolbar.propTypes = {
+CustomizableTableToolbar.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-EnhancedTableToolbar = withStyles(toolbarStyles)(EnhancedTableToolbar);
+CustomizableTableToolbar = withStyles(toolbarStyles)(CustomizableTableToolbar);
 
-class EditRemoveTable extends React.Component {
+class CustomizableTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -188,10 +205,10 @@ class EditRemoveTable extends React.Component {
 
     return (
       <Material.Paper className={classes.root}>
-        <EnhancedTableToolbar title={this.props.title} />
+        <CustomizableTableToolbar title={this.props.title} />
         <div className={classes.tableWrapper}>
           <Material.Table className={classes.table} aria-labelledby="tableTitle">
-            <EnhancedTableHead
+            <CustomizableTableHead
               order={order}
               orderBy={orderBy}
               onRequestSort={this.handleRequestSort}
@@ -232,8 +249,8 @@ class EditRemoveTable extends React.Component {
   }
 }
 
-EditRemoveTable.propTypes = {
+CustomizableTable.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(EditRemoveTable);
+export default withStyles(styles)(CustomizableTable);
