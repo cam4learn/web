@@ -113,10 +113,16 @@ class Subjects extends Component {
           label: 'Name'
         },
         {
-          id: 'editBtn',
+          id: 'lectName',
           numeric: false,
           disablePadding: false,
-          label: 'Edit',
+          label: 'Lecturer name',
+        },
+        {
+          id: 'lectSurname',
+          numeric: false,
+          disablePadding: false,
+          label: 'Lecturer surname',
         },
         {
           id: 'deleteBtn',
@@ -166,14 +172,8 @@ class Subjects extends Component {
             {obj.id}
           </Material.TableCell>
           <Material.TableCell>{obj.title}</Material.TableCell>
-          <Material.TableCell>
-            <Material.Button
-            variant="contained"
-            color="secondary">
-              Edit
-              <Icons.Edit className={this.classes.rightIcon} />
-            </Material.Button>
-          </Material.TableCell>
+          <Material.TableCell>{obj.name}</Material.TableCell>
+          <Material.TableCell>{obj.surname}</Material.TableCell>
           <Material.TableCell>
             <Material.Button
             variant="contained"

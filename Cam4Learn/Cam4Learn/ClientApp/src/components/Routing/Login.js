@@ -92,7 +92,7 @@ class Login extends Component {
             <Material.Input
               id="login-input"
               onChange={(e) => this.onChangeInput('login', e)}
-              aria-describedby="component-error-text"
+              aria-describedby="login-input-err"
             />
             <Material.FormHelperText id="login-input-err"
               className={classNames(this.state.loginError ? this.classes.displayInherit : this.classes.displayNone)}>
@@ -105,7 +105,7 @@ class Login extends Component {
             <Material.Input
               id="pass-input"
               onChange={(e) => this.onChangeInput('password', e)}
-              aria-describedby="component-error-text"
+              aria-describedby="pass-input-err"
               type={this.state.showPassword ? 'text' : 'password'}
               endAdornment={
                 <Material.InputAdornment position="end">
@@ -121,7 +121,7 @@ class Login extends Component {
             <Material.FormHelperText id="pass-input-err"
               className={classNames(this.state.passError ? this.classes.displayInherit : this.classes.displayNone)}>
               Invalid password
-              </Material.FormHelperText>
+            </Material.FormHelperText>
           </Material.FormControl>
 
           <Material.Button variant="contained" color="primary" className={this.classes.button} onClick={this.submit}>

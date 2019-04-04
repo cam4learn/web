@@ -7,6 +7,7 @@ import Login from './components/Routing/Login';
 import Lecturers from './components/Routing/Lecturers';
 import Subjects from './components/Routing/Subjects';
 import Export from './components/Routing/Export';
+import Rooms from './components/Routing/Rooms';
 
 import * as Icons from '@material-ui/icons';
 import * as Material from '@material-ui/core';
@@ -29,6 +30,12 @@ export default class App extends Component {
         title: "Lecturers",
         icon: <Icons.SupervisedUserCircle />,
         route: "/lecturers",
+        role: ['Admin']
+      },
+      {
+        title: "Rooms",
+        icon: <Icons.MeetingRoom />,
+        route: "/rooms",
         role: ['Admin']
       },
       {
@@ -75,6 +82,7 @@ export default class App extends Component {
           <Route exact path="/login" render={(props) => <Login {...props} authCallback={this.authChange} />} />
           <Route exact path="/lecturers" component={Lecturers} />
           <Route exact path="/subjects" component={Subjects} />
+          <Route exact path="/rooms" component={Rooms} />
           <Route exact path="/export" component={Export} />
           <Route component={NotFound} />
         </Switch>

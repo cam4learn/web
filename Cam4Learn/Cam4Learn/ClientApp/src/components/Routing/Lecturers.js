@@ -95,7 +95,6 @@ class Lecturers extends Component {
     super(props);
 
     this.classes = this.props.classes;
-    console.log(this.classes);
     this.theme = this.props.theme;
 
     this.state = {
@@ -134,7 +133,35 @@ class Lecturers extends Component {
       ],
 
       deleteOpen: false,
-      currentDelete: {},
+      deleteState: {},
+
+      editOpen: false,
+      editState: {
+        id: 0,
+        name: '',
+        surname: '',
+        login: ''
+      },
+      editErrors: {
+        name: false,
+        surname: false,
+        login: false
+      },
+
+      addOpen: false,
+      addState: {
+        name: '',
+        surname: '',
+        login: '',
+        password: '',
+      },
+      addErrors: {
+        name: false,
+        surname: false,
+        login: false,
+        password: false
+      },
+      showPassword: false
     }
 
     this.createRow = this.createRow.bind(this);
@@ -143,22 +170,146 @@ class Lecturers extends Component {
     this.refresh();
   }
 
-  showAdd = () => {
-
+  addShow = () => {
+    this.setState({
+      addOpen: true,
+    });
   }
 
-  showEdit = (obj) => {
+  addHide = () => {
+    this.setState({
+      addOpen: false,
+      addState: {
+        name: '',
+        surname: '',
+        login: '',
+        password: ''
+      },
+      addErrors: {
+        name: false,
+        surname: false,
+        login: false,
+        password: false
+      }
+    });
+  }
 
-  } 
+  addSubmit = () => {
+    let err = false;
+    if (!this.state.addState.name) {
+      this.setState(prev => ({ addErrors: { ...prev.addErrors, name: true } }));
+      err = true;
+    }
+    if (!this.state.addState.surname) {
+      this.setState(prev => ({ addErrors: { ...prev.addErrors, surname: true } }));
+      err = true;
+    }
+    if (!this.state.addState.login) {
+      this.setState(prev => ({ addErrors: { ...prev.addErrors, login: true } }));
+      err = true;
+    }
+    if (this.state.addState.password.length < 6) {
+      this.setState(prev => ({ addErrors: { ...prev.addErrors, password: true } }));
+      err = true;
+    }
 
-  showDelete = (obj) => {
+    if (!err) {
+      let data = JSON.stringify({
+        name: this.state.addState.name,
+        surname: this.state.addState.surname,
+        login: this.state.addState.login,
+        password: this.state.addState.password
+      });
+
+      AuthorizedAxios.post("/api/admin/addLector", data)
+        .then(response => {
+          console.log(response.data);
+          this.refresh();
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .then(() => {
+          this.addHide();
+        });
+    }
+  }
+
+
+  editShow = (obj) => {
+    this.setState({
+      editOpen: true,
+      editState: {
+        id: obj.id,
+        name: obj.name,
+        surname: obj.surname,
+        login: obj.login
+      },
+    });
+  }
+
+  editHide = () => {
+    this.setState({
+      editOpen: false,
+      editState: {
+        id: 0,
+        name: '',
+        surname: '',
+        login: ''
+      },
+      editErrors: {
+        name: false,
+        surname: false,
+        login: false
+      }
+    });
+  }
+
+  editSubmit = () => {
+    let err = false;
+    if (!this.state.editState.name) {
+      this.setState(prev => ({ editErrors: { ...prev.editErrors, name: true } }));
+      err = true;
+    }
+    if (!this.state.editState.surname) {
+      this.setState(prev => ({ editErrors: { ...prev.editErrors, surname: true } }));
+      err = true;
+    }
+    if (!this.state.editState.login) {
+      this.setState(prev => ({ editErrors: { ...prev.editErrors, login: true } }));
+      err = true;
+    }
+
+    if (!err) {
+      let data = JSON.stringify({
+        id: this.state.editState.id,
+        name: this.state.editState.name,
+        surname: this.state.editState.surname,
+        login: this.state.editState.login,
+      });
+
+      AuthorizedAxios.patch("/api/admin/changeLector", data)
+        .then(response => {
+          console.log(response.data);
+          this.refresh();
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .then(() => {
+          this.editHide();
+        });
+    }
+  }
+
+  deleteShow = (obj) => {
     this.setState({
       deleteOpen: true,
       currentDelete: obj
     });
   }
 
-  hideDelete = () => {
+  deleteHide = () => {
     this.setState({
       deleteOpen: false,
       currentDelete: {}
@@ -185,6 +336,41 @@ class Lecturers extends Component {
       });
   }
 
+  changeField = (e, section, field) => {
+    let value = e.target.value;
+
+    switch (section) {
+      case 'edit':
+        switch (field) {
+          case 'name':
+            this.setState(prev => ({ editState: { ...prev.editState, name: value } }));
+            break;
+          case 'surname':
+            this.setState(prev => ({ editState: { ...prev.editState, surname: value } }));
+            break;
+          case 'login':
+            this.setState(prev => ({ editState: { ...prev.editState, login: value } }));
+            break;
+        }
+        break;
+      case 'add':
+        switch (field) {
+          case 'name':
+            this.setState(prev => ({ addState: { ...prev.addState, name: value } }));
+            break;
+          case 'surname':
+            this.setState(prev => ({ addState: { ...prev.addState, surname: value } }));
+            break;
+          case 'login':
+            this.setState(prev => ({ addState: { ...prev.addState, login: value } }));
+            break;
+          case 'password':
+            this.setState(prev => ({ addState: { ...prev.addState, password: value } }));
+            break;
+        }
+    }
+  }
+
   createRow(obj) {
     console.log("Create row");
     console.log(obj);
@@ -203,7 +389,7 @@ class Lecturers extends Component {
           <Material.Button
             variant="contained"
             color="secondary"
-            onClick={() => this.showEdit(obj)}>
+            onClick={() => this.editShow(obj)}>
             Edit
               <Icons.Edit className={this.classes.rightIcon} />
           </Material.Button>
@@ -212,7 +398,7 @@ class Lecturers extends Component {
           <Material.Button
             variant="contained"
             className={classNames(this.classes.danger)}
-            onClick={() => this.showDelete(obj)}>
+            onClick={() => this.deleteShow(obj)}>
             Delete
               <Icons.Delete className={this.classes.rightIcon} />
           </Material.Button>
@@ -254,7 +440,7 @@ class Lecturers extends Component {
               <Material.Button
                 variant="contained"
                 className={classNames(this.classes.add)}
-                onClick={this.showAdd}>
+                onClick={this.addShow}>
                 Add
               <Icons.Add className={this.classes.rightIcon} />
               </Material.Button>
@@ -271,7 +457,7 @@ class Lecturers extends Component {
           <Material.Dialog
             fullScreen={fullScreen}
             open={this.state.deleteOpen}
-            onClose={this.hideDelete}
+            onClose={this.deleteHide}
             aria-labelledby="responsive-dialog-title">
 
             <Material.DialogTitle id="responsive-dialog-title">
@@ -284,7 +470,7 @@ class Lecturers extends Component {
               </Material.DialogContentText>
             </Material.DialogContent>
             <Material.DialogActions>
-              <Material.Button onClick={this.hideDelete}>
+              <Material.Button onClick={this.deleteHide}>
                 Cancel
               </Material.Button>
               <Material.Button
@@ -295,11 +481,182 @@ class Lecturers extends Component {
               </Material.Button>
             </Material.DialogActions>
           </Material.Dialog>
+
+          <Material.Dialog
+            fullScreen={fullScreen}
+            open={this.state.editOpen}
+            onClose={this.editHide}
+            maxWidth='sm'
+            fullWidth={true}
+            aria-labelledby="responsive-dialog-title">
+
+            <Material.DialogTitle id="responsive-dialog-title">
+              Lecturer edit
+            </Material.DialogTitle>
+
+            <Material.DialogContent className={this.classes.flexContainer}>
+              <Material.FormControl className={this.classes.m4}
+                error={this.state.editErrors.name}>
+                <Material.InputLabel htmlFor="edit-name-input">Name</Material.InputLabel>
+                <Material.Input
+                  id="edit-name-input"
+                  value={this.state.editState.name}
+                  onChange={(e) => this.changeField(e, 'edit', 'name')}
+                  aria-describedby="edit-name-err"/>
+                <Material.FormHelperText id="edit-name-err"
+                  className={classNames(this.state.editErrors.name ? this.classes.displayInherit : this.classes.displayNone)}>
+                  Name is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+
+              <Material.FormControl className={this.classes.m4}
+                error={this.state.editErrors.surname}>
+                <Material.InputLabel htmlFor="edit-surname-input">Surname</Material.InputLabel>
+                <Material.Input
+                  id="edit-surname-input"
+                  value={this.state.editState.surname}
+                  onChange={(e) => this.changeField(e, 'edit', 'surname')}
+                  aria-describedby="edit-surname-err">
+                </Material.Input>
+                <Material.FormHelperText id="edit-surname-err"
+                  className={classNames(this.state.editErrors.surname ? this.classes.displayInherit : this.classes.displayNone)}>
+                  Surname is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+
+              <Material.FormControl className={this.classes.m4}
+                error={this.state.editErrors.login}>
+                <Material.InputLabel htmlFor="edit-login-input">Login</Material.InputLabel>
+                <Material.Input
+                  id="edit-login-input"
+                  value={this.state.editState.login}
+                  onChange={(e) => this.changeField(e, 'edit', 'login')}
+                  aria-describedby="edit-login-err">
+                </Material.Input>
+                <Material.FormHelperText id="edit-login-err"
+                  className={classNames(this.state.editErrors.login ? this.classes.displayInherit : this.classes.displayNone)}>
+                  Login is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+            </Material.DialogContent>
+            <Material.DialogActions>
+              <Material.Button onClick={this.editHide}>
+                Cancel
+              </Material.Button>
+              <Material.Button
+                onClick={this.editSubmit}
+                className={this.classes.foregroundDanger}
+                autoFocus>
+                Submit
+              </Material.Button>
+            </Material.DialogActions>
+          </Material.Dialog>
+
+          <Material.Dialog
+            fullScreen={fullScreen}
+            open={this.state.addOpen}
+            maxWidth='sm'
+            fullWidth={true}
+            onClose={this.addHide}
+            aria-labelledby="responsive-dialog-title">
+
+            <Material.DialogTitle id="responsive-dialog-title">
+              Create new lecturer
+            </Material.DialogTitle>
+
+            <Material.DialogContent className={this.classes.flexContainer}>
+              <Material.FormControl className={this.classes.m4}
+                error={this.state.addErrors.name}>
+                <Material.InputLabel htmlFor="add-name-input">Name</Material.InputLabel>
+                <Material.Input
+                  id="add-name-input"
+                  value={this.state.addState.name}
+                  onChange={(e) => this.changeField(e, 'add', 'name')}
+                  aria-describedby="add-name-err"
+                />
+                <Material.FormHelperText id="add-name-err"
+                  className={classNames(this.state.addErrors.name ? this.classes.displayInherit : this.classes.displayNone)}>
+                  Name is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+
+              <Material.FormControl className={this.classes.m4}
+                error={this.state.addErrors.surname}>
+                <Material.InputLabel htmlFor="add-surname-input">Surname</Material.InputLabel>
+                <Material.Input
+                  id="add-surname-input"
+                  value={this.state.addState.surname}
+                  onChange={(e) => this.changeField(e, 'add', 'surname')}
+                  aria-describedby="add-surname-err">
+                </Material.Input>
+                <Material.FormHelperText id="add-surname-err"
+                  className={classNames(this.state.addErrors.surname ? this.classes.displayInherit : this.classes.displayNone)}>
+                  Surname is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+
+              <Material.FormControl className={this.classes.m4}
+                error={this.state.addErrors.login}>
+                <Material.InputLabel htmlFor="add-login-input">Login</Material.InputLabel>
+                <Material.Input
+                  id="add-login-input"
+                  value={this.state.addState.login}
+                  onChange={(e) => this.changeField(e, 'add', 'login')}
+                  aria-describedby="add-login-err">
+                </Material.Input>
+                <Material.FormHelperText id="add-login-err"
+                  className={classNames(this.state.addErrors.login ? this.classes.displayInherit : this.classes.displayNone)}>
+                  Login is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+
+              <Material.FormControl className={this.classes.m4}
+                error={this.state.addErrors.password}>
+                <Material.InputLabel htmlFor="add-password-input">Password</Material.InputLabel>
+                <Material.Input
+                  id="add-password-input"
+                  type={this.state.showPassword ? 'text' : 'password'}
+                  value={this.state.addState.password}
+                  onChange={(e) => this.changeField(e, 'add', 'password')}
+                  aria-describedby="add-password-err"
+                  endAdornment={
+                    <Material.InputAdornment position="end">
+                      <Material.IconButton
+                        aria-label="Toggle password visibility"
+                        onClick={this.handleClickShowPassword}
+                      >
+                        {this.state.showPassword ? <Icons.Visibility /> : <Icons.VisibilityOff />}
+                      </Material.IconButton>
+                    </Material.InputAdornment>
+                  }
+                >
+                </Material.Input>
+                <Material.FormHelperText id="add-password-err"
+                  className={classNames(this.state.addErrors.password ? this.classes.displayInherit : this.classes.displayNone)}>
+                  Password must be not less than 6 characters
+                </Material.FormHelperText>
+              </Material.FormControl>
+
+            </Material.DialogContent>
+            <Material.DialogActions>
+              <Material.Button onClick={this.addHide}>
+                Cancel
+              </Material.Button>
+              <Material.Button
+                onClick={this.addSubmit}
+                className={this.classes.foregroundDanger}
+                autoFocus>
+                Submit
+              </Material.Button>
+            </Material.DialogActions>
+          </Material.Dialog>
         </Material.Grid>
       );
-
-    //TODO: "Add" and "Edit" dialogs
   }
+
+  handleClickShowPassword = () => {
+    this.setState(state => ({ showPassword: !state.showPassword }));
+  };
 }
 
 Lecturers.propTypes = {
