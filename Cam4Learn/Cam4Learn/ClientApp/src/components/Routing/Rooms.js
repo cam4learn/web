@@ -113,6 +113,12 @@ class Rooms extends Component {
           label: 'Room'
         },
         {
+          id: 'mac',
+          numeric: false,
+          disablePadding: false,
+          label: 'MAC Address'
+        },
+        {
           id: 'editBtn',
           numeric: false,
           disablePadding: false,
@@ -189,6 +195,9 @@ class Rooms extends Component {
         </Material.TableCell>
         <Material.TableCell>
           {obj.room}
+        </Material.TableCell>
+        <Material.TableCell>
+          {obj.address}
         </Material.TableCell>
         <Material.TableCell>
           <Material.Button
