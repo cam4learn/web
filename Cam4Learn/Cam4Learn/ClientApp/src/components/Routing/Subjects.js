@@ -5,7 +5,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from 'react-router-dom';
 import * as Icons from '@material-ui/icons';
 import * as Material from '@material-ui/core';
-import { TokenLocalKey, AuthorizedAxios } from '../api';
+import { TokenLocalKey, AuthorizedAxios, UnauthorizedAxios } from '../api';
+import { downloadFile } from '../fileDownload';
 
 import CustomizableTable from '../CustomizableTable';
 
@@ -37,7 +38,6 @@ const styles = theme => ({
   displayInherit: {
     'display': [['inherit'], '!important']
   },
-
   table: {
     marginLeft: theme.spacing.unit * 6,
     marginRight: theme.spacing.unit * 6
@@ -78,6 +78,12 @@ const styles = theme => ({
       'background-color': '#388E3C'
     }
   },
+  exportCSV: {
+    'background-color': '#9ccc65',
+    '&:hover': {
+      'background-color': '#6b9b37'
+    }
+  },
   foregroundDanger: {
     'color': '#F44336'
   },
@@ -86,6 +92,9 @@ const styles = theme => ({
   },
   m4: {
     'margin': '1em'
+  },
+  mt4: {
+    'margin-top': '1rem'
   }
 });
 
@@ -159,6 +168,7 @@ class Subjects extends Component {
     this.addEditSubmit = this.addEditSubmit.bind(this);
 
     this.onChangeInput = this.onChangeInput.bind(this);
+    this.exportCSV = this.exportCSV.bind(this);
 
     this.refresh();
   }
@@ -285,6 +295,16 @@ class Subjects extends Component {
     this.hideAddEdit();
   }
 
+  exportCSV() {
+    UnauthorizedAxios.get('/getSubjectsCsv')
+      .then(resp => {
+        downloadFile('subjects.csv', resp.data);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
+
   onChangeInput(name, e) {
     switch (name) {
       case 'subjectName':
@@ -350,6 +370,20 @@ class Subjects extends Component {
               title="Subjects"
               createRow={this.createRow}
             />
+
+            <Material.Grid container
+              direction="row"
+              justify="space-between"
+              alignItems="flex-end"
+              className={classNames(this.classes.mt4)} >
+              <Material.Button
+                variant="contained"
+                className={classNames(this.classes.exportCSV)}
+                onClick={this.exportCSV}>
+                Export CSV
+              <Icons.TableChart className={this.classes.rightIcon} />
+              </Material.Button>
+            </Material.Grid>
           </Material.Grid>
 
           <Material.Dialog
@@ -432,6 +466,7 @@ class Subjects extends Component {
               </Material.Button>
             </Material.DialogActions>
           </Material.Dialog>
+
         </Material.Grid>
         );
   }

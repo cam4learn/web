@@ -133,6 +133,15 @@ class PersistentDrawerLeft extends React.Component {
               className={classNames((this.state.role == null) && this.classes.hide)}>
               <Icons.ExitToApp />
             </Material.IconButton>
+
+            <Material.IconButton
+              color="inherit"
+              className={classNames((this.state.role != null) && this.classes.hide)}
+              component={RouterLink}
+              to="/login"
+            >
+              <Icons.AccountCircle />
+            </Material.IconButton>
           </Material.Toolbar>
         </Material.AppBar>
         <Material.Drawer
