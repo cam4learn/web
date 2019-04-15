@@ -133,8 +133,29 @@ class Rooms extends Component {
       ],
 
       deleteOpen: false,
+      deleteState: {},
+
       editOpen: false,
+      editState: {
+	      id: 0,
+	      room: '',
+	      mac: ''
+      },
+      editErrors: {
+	      room: false,
+	      mac: false
+      },
+
       addOpen: false,
+      addState: {
+	      id: 0,
+	      room: '',
+	      mac: ''
+      },
+      addErrors: {
+	      room: false,
+	      mac: false
+      }
     }
 
     this.createRow = this.createRow.bind(this);
@@ -144,45 +165,173 @@ class Rooms extends Component {
   }
 
   addShow = () => {
-    
+	  this.setState({
+		  addOpen: true,
+	  });
   }
 
   addHide = () => {
-    
+	  this.setState({
+		  addOpen: false,
+		  addState: {
+			  room: '',
+			  mac: ''
+		  },
+		  addErrors: {
+			  room: false,
+			  mac: false
+		  }
+	  });
   }
 
   addSubmit = () => {
-    
+	  let err = false;
+	  if (!this.state.addState.mac) {
+		  this.setState(prev => ({ addErrors: { ...prev.addErrors, mac: true } }));
+		  err = true;
+	  }
+	  if (!this.state.addState.room) {
+		  this.setState(prev => ({ addErrors: { ...prev.addErrors, room: true } }));
+		  err = true;
+	  }
+
+	  if (!err) {
+		  let data = JSON.stringify({
+			  address: this.state.addState.mac,
+			  room: this.state.addState.room
+		  });
+
+		  AuthorizedAxios.post("/api/admin/device", data)
+			  .then(response => {
+				  console.log(response.data);
+				  this.refresh();
+			  })
+			  .catch(error => {
+				  console.log(error);
+			  })
+			  .then(() => {
+				  this.addHide();
+			  });
+	  }
   }
 
 
   editShow = (obj) => {
-    
+	  this.setState({
+		  editOpen: true,
+		  editState: {
+			  id: obj.id,
+			  mac: obj.address,
+			  room: obj.room
+		  },
+	  });
   }
 
   editHide = () => {
-    
+	  this.setState({
+		  editOpen: false,
+		  editState: {
+			  id: 0,
+			  room: '',
+			  mac: ''
+		  },
+		  editErrors: {
+			  room: false,
+			  mac: false
+		  }
+	  });
   }
 
   editSubmit = () => {
-    
+	let err = false;
+	if (!this.state.editState.mac) {
+		this.setState(prev => ({ editErrors: { ...prev.editErrors, mac: true } }));
+		err = true;
+	}
+	if (!this.state.editState.room) {
+		this.setState(prev => ({ editErrors: { ...prev.editErrors, room: true } }));
+		err = true;
+	}
+
+	  if (!err) {
+		  let data = JSON.stringify({
+			  id: this.state.editState.id,
+			  address: this.state.editState.mac,
+			  room: this.state.editState.room
+		  });
+
+		  AuthorizedAxios.patch("/api/admin/device", data)
+			  .then(response => {
+				  console.log(response.data);
+				  this.refresh();
+			  })
+			  .catch(error => {
+				  console.log(error);
+			  })
+			  .then(() => {
+				  this.editHide();
+			  });
+	  }
   }
 
   deleteShow = (obj) => {
-    
+	  this.setState({
+		  deleteOpen: true,
+		  currentDelete: obj
+	  });
   }
 
   deleteHide = () => {
-    
+	  this.setState({
+		  deleteOpen: false,
+		  currentDelete: {}
+	  });
   }
 
   deleteRoom = () => {
+	  console.log("deleteRoom");
+	  console.log(this.state.currentDelete);
+	  var data = JSON.stringify({
+		  id: this.state.currentDelete.id
+	  });
 
+	  AuthorizedAxios.delete("/api/admin/device", { data: data })
+		  .then(response => {
+			  console.log(response.data);
+			  this.refresh();
+		  })
+		  .catch(error => {
+			  console.log(error);
+		  })
+		  .then(() => {
+			  this.deleteHide();
+		  });
   }
 
   changeField = (e, section, field) => {
     let value = e.target.value;
 
+    switch (section) {
+    case 'edit':
+	    switch (field) {
+	    case 'mac':
+		    this.setState(prev => ({ editState: { ...prev.editState, mac: value } }));
+		    break;
+	    case 'room':
+		    this.setState(prev => ({ editState: { ...prev.editState, room: value } }));
+		    break;
+	    }
+	    break;
+    case 'add':
+	    switch (field) {
+	    case 'mac':
+		    this.setState(prev => ({ addState: { ...prev.addState, mac: value } }));
+		    break;
+	    case 'room':
+		    this.setState(prev => ({ addState: { ...prev.addState, room: value } }));
+		    break;
+	    }
+    }
   }
 
   createRow(obj) {
@@ -308,8 +457,36 @@ class Rooms extends Component {
               Room edit
             </Material.DialogTitle>
 
-            <Material.DialogContent className={this.classes.flexContainer}>
-              INSERT FORM HERE (SEE OTHER PAGES)
+			<Material.DialogContent className={this.classes.flexContainer}>
+
+				<Material.FormControl className={this.classes.m4} error={this.state.editErrors.mac}>
+					<Material.InputLabel htmlFor="edit-name-input">Address</Material.InputLabel>
+						<Material.Input
+							  id="edit-mac-input"
+							  value={this.state.editState.mac}
+							  onChange={(e) => this.changeField(e, 'edit', 'mac')}
+							  aria-describedby="edit-mac-err" />
+					<Material.FormHelperText id="edit-mac-err"
+							  className={classNames(this.state.editErrors.mac ? this.classes.displayInherit : this.classes.displayNone)}>
+							  Address is required
+					</Material.FormHelperText>
+				</Material.FormControl>
+
+				<Material.FormControl className={this.classes.m4}
+						  error={this.state.editErrors.room}>
+						  <Material.InputLabel htmlFor="edit-surname-input">Room</Material.InputLabel>
+						  <Material.Input
+							  id="edit-room-input"
+							  value={this.state.editState.room}
+							  onChange={(e) => this.changeField(e, 'edit', 'room')}
+							  aria-describedby="edit-room-err">
+						  </Material.Input>
+					<Material.FormHelperText id="edit-room-err"
+							className={classNames(this.state.editErrors.room ? this.classes.displayInherit : this.classes.displayNone)}>
+							Room is required and should be numeric
+					</Material.FormHelperText>
+				</Material.FormControl>
+              
             </Material.DialogContent>
 
             <Material.DialogActions>
@@ -325,6 +502,7 @@ class Rooms extends Component {
             </Material.DialogActions>
           </Material.Dialog>
 
+
           <Material.Dialog
             fullScreen={fullScreen}
             open={this.state.addOpen}
@@ -338,8 +516,42 @@ class Rooms extends Component {
             </Material.DialogTitle>
 
             <Material.DialogContent className={this.classes.flexContainer}>
-              INSERT FORM HERE TOO
-            </Material.DialogContent>
+
+			<Material.FormControl className={this.classes.m4} error={this.state.addErrors.mac}>
+				<Material.InputLabel htmlFor="add-mac-input">
+					Address
+				</Material.InputLabel>
+
+				<Material.Input
+					id="add-mac-input"
+					value={this.state.addState.mac}
+					onChange={(e) => this.changeField(e, 'add', 'mac')}
+					aria-describedby="add-mac-err"
+					/>
+				<Material.FormHelperText id="add-mac-err"
+					className={classNames(this.state.addErrors.mac ? this.classes.displayInherit : this.classes.displayNone)}>
+					Address is required
+				</Material.FormHelperText>
+			</Material.FormControl>
+
+			<Material.FormControl className={this.classes.m4}error={this.state.addErrors.room}>
+				<Material.InputLabel htmlFor="add-room-input">
+				Room
+				</Material.InputLabel>
+				<Material.Input
+				  id="add-room-input"
+				  value={this.state.addState.room}
+				  onChange={(e) => this.changeField(e, 'add', 'room')}
+				  aria-describedby="add-room-err">
+			  </Material.Input>
+				<Material.FormHelperText id="add-room-err"
+				  className={classNames(this.state.addErrors.room ? this.classes.displayInherit : this.classes.displayNone)}>
+				  Room is required and should be numeric
+				</Material.FormHelperText>
+			</Material.FormControl>
+
+			</Material.DialogContent>
+
             <Material.DialogActions>
               <Material.Button onClick={this.addHide}>
                 Cancel
