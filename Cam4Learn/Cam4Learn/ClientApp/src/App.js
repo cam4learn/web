@@ -8,6 +8,7 @@ import Lecturers from './components/Routing/Lecturers';
 import Subjects from './components/Routing/Subjects';
 import Export from './components/Routing/Export';
 import Rooms from './components/Routing/Rooms';
+import GroupsRouter from './components/Routing/Groups/GroupsRouter';
 
 import * as Icons from '@material-ui/icons';
 import * as Material from '@material-ui/core';
@@ -36,6 +37,12 @@ export default class App extends Component {
         title: "Rooms",
         icon: <Icons.MeetingRoom />,
         route: "/rooms",
+        role: ['Admin']
+      },
+      {
+        title: "Groups",
+        icon: <Icons.Group />,
+        route: "/groups/list",
         role: ['Admin']
       },
       {
@@ -84,6 +91,7 @@ export default class App extends Component {
           <Route exact path="/subjects" component={Subjects} />
           <Route exact path="/rooms" component={Rooms} />
           <Route exact path="/export" component={Export} />
+          <Route path="/groups" component={GroupsRouter} />
           <Route component={NotFound} />
         </Switch>
       </PersistentDrawer>
