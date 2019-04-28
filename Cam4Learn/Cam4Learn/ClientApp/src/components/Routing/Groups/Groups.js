@@ -294,24 +294,25 @@ class Groups extends Component {
     });
   }
 
-  deleteLecturer = () => {
-    console.log("deleteSubject");
-    console.log(this.state.currentDelete);
-    var data = JSON.stringify({
-      id: this.state.currentDelete.id
-    });
+  deleteGroup = () => {
+	console.log("deleteGroup");
+	console.log(this.state.currentDelete);
+	var data = JSON.stringify({
+		id: this.state.currentDelete.id
+	});
 
-    AuthorizedAxios.delete("/api/admin/deleteLector", { data: data })
-      .then(response => {
-        console.log(response.data);
-        this.refresh();
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      .then(() => {
-        this.hideDelete();
-      });
+	  console.log(data);
+	  AuthorizedAxios.delete("/api/admin/group", { data: data })
+		.then(response => {
+			console.log(response.data);
+			this.refresh();
+		})
+		.catch(error => {
+			console.log(error);
+		})
+		.then(() => {
+			this.deleteHide();
+		});
   }
 
   changeField = (e, section, field) => {
@@ -454,7 +455,7 @@ class Groups extends Component {
                 Cancel
               </Material.Button>
               <Material.Button
-                onClick={this.deleteLecturer}
+                onClick={this.deleteGroup}
                 className={classes.foregroundDanger}
                 autoFocus>
                 Delete
