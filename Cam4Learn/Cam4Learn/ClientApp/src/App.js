@@ -48,7 +48,7 @@ export default class App extends Component {
 	  },
 	  {
         title: "Students",
-        icon: <Icons.Group />,
+        icon: <Icons.People />,
         route: "/students",
         role: ['Admin']
       },

@@ -221,7 +221,7 @@ class Students extends Component {
 				groupId: this.state.groups.find(x => x.name === this.state.addState.group).id 
 			});
 
-			AuthorizedAxios.post("/api/admin/student", data)
+			AuthorizedAxios().post("/api/admin/student", data)
 				.then(response => {
 					console.log(response.data);
 					this.refresh();
@@ -362,7 +362,7 @@ class Students extends Component {
 
 	refresh() {
 		console.log("refresh");
-		AuthorizedAxios.get("/api/admin/student")
+		AuthorizedAxios().get("/api/admin/student")
 			.then(response => {
 				console.log("Refresh");
 				console.log(response);
@@ -370,7 +370,7 @@ class Students extends Component {
 			}).catch(error => {
 				console.log(error);
 			});
-		AuthorizedAxios.get("/api/admin/group")
+		AuthorizedAxios().get("/api/admin/group")
 			.then(response => {
 				console.log("Refresh");
 				console.log(response);
@@ -410,7 +410,7 @@ class Students extends Component {
 						<CustomizableTable
 							headers={this.state.headers}
 							data={this.state.data}
-							title="Groups"
+							title="Students"
 							createRow={this.createRow}
 						/>
 					</Material.Grid>

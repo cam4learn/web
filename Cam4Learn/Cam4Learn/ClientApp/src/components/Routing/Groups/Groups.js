@@ -110,12 +110,6 @@ class Groups extends Component {
           label: 'Name'
         },
         {
-          id: 'surname',
-          numeric: false,
-          disablePadding: false,
-          label: 'Surname'
-        },
-        {
           id: 'editBtn',
           numeric: false,
           disablePadding: false,
@@ -134,18 +128,20 @@ class Groups extends Component {
 
       editOpen: false,
       editState: {
-        
+        id: -1,
+        name: ''
       },
       editErrors: {
-        
+        id: false,
+        name: false
       },
 
       addOpen: false,
       addState: {
-        
+        name: ''
       },
       addErrors: {
-        
+        name: false
       },
     }
 
@@ -165,9 +161,11 @@ class Groups extends Component {
     this.setState({
       addOpen: false,
       addState: {
-
+        id: -1,
+        name: ''
       },
       addErrors: {
+        name: false
       }
     });
   }
@@ -178,28 +176,13 @@ class Groups extends Component {
       this.setState(prev => ({ addErrors: { ...prev.addErrors, name: true } }));
       err = true;
     }
-    if (!this.state.addState.surname) {
-      this.setState(prev => ({ addErrors: { ...prev.addErrors, surname: true } }));
-      err = true;
-    }
-    if (!this.state.addState.login) {
-      this.setState(prev => ({ addErrors: { ...prev.addErrors, login: true } }));
-      err = true;
-    }
-    if (this.state.addState.password.length < 6) {
-      this.setState(prev => ({ addErrors: { ...prev.addErrors, password: true } }));
-      err = true;
-    }
 
     if (!err) {
       let data = JSON.stringify({
         name: this.state.addState.name,
-        surname: this.state.addState.surname,
-        login: this.state.addState.login,
-        password: this.state.addState.password
       });
 
-      AuthorizedAxios.post("/api/admin/addLector", data)
+      AuthorizedAxios().post("/api/admin/group", data)
         .then(response => {
           console.log(response.data);
           this.refresh();
@@ -220,8 +203,6 @@ class Groups extends Component {
       editState: {
         id: obj.id,
         name: obj.name,
-        surname: obj.surname,
-        login: obj.login
       },
     });
   }
@@ -230,15 +211,12 @@ class Groups extends Component {
     this.setState({
       editOpen: false,
       editState: {
-        id: 0,
+        id: -1,
         name: '',
-        surname: '',
-        login: ''
       },
       editErrors: {
+        id: false,
         name: false,
-        surname: false,
-        login: false
       }
     });
   }
@@ -249,24 +227,14 @@ class Groups extends Component {
       this.setState(prev => ({ editErrors: { ...prev.editErrors, name: true } }));
       err = true;
     }
-    if (!this.state.editState.surname) {
-      this.setState(prev => ({ editErrors: { ...prev.editErrors, surname: true } }));
-      err = true;
-    }
-    if (!this.state.editState.login) {
-      this.setState(prev => ({ editErrors: { ...prev.editErrors, login: true } }));
-      err = true;
-    }
 
     if (!err) {
       let data = JSON.stringify({
         id: this.state.editState.id,
         name: this.state.editState.name,
-        surname: this.state.editState.surname,
-        login: this.state.editState.login,
       });
 
-      AuthorizedAxios.patch("/api/admin/changeLector", data)
+      AuthorizedAxios().patch("/api/admin/group", data)
         .then(response => {
           console.log(response.data);
           this.refresh();
@@ -302,7 +270,7 @@ class Groups extends Component {
 	});
 
 	  console.log(data);
-	  AuthorizedAxios.delete("/api/admin/group", { data: data })
+	  AuthorizedAxios().delete("/api/admin/group", { data: data })
 		.then(response => {
 			console.log(response.data);
 			this.refresh();
@@ -324,27 +292,12 @@ class Groups extends Component {
           case 'name':
             this.setState(prev => ({ editState: { ...prev.editState, name: value } }));
             break;
-          case 'surname':
-            this.setState(prev => ({ editState: { ...prev.editState, surname: value } }));
-            break;
-          case 'login':
-            this.setState(prev => ({ editState: { ...prev.editState, login: value } }));
-            break;
         }
         break;
       case 'add':
         switch (field) {
           case 'name':
             this.setState(prev => ({ addState: { ...prev.addState, name: value } }));
-            break;
-          case 'surname':
-            this.setState(prev => ({ addState: { ...prev.addState, surname: value } }));
-            break;
-          case 'login':
-            this.setState(prev => ({ addState: { ...prev.addState, login: value } }));
-            break;
-          case 'password':
-            this.setState(prev => ({ addState: { ...prev.addState, password: value } }));
             break;
         }
     }
@@ -362,9 +315,6 @@ class Groups extends Component {
         </Material.TableCell>
         <Material.TableCell>
           {obj.name}
-        </Material.TableCell>
-        <Material.TableCell>
-          {obj.surname}
         </Material.TableCell>
         <Material.TableCell>
           <Material.Button
@@ -390,7 +340,7 @@ class Groups extends Component {
 
   refresh() {
     console.log("refresh");
-    AuthorizedAxios.get("/api/admin/getLectors")
+    AuthorizedAxios().get("/api/admin/group")
       .then(response => {
         console.log("Refresh");
         console.log(response);
@@ -476,8 +426,9 @@ class Groups extends Component {
             </Material.DialogTitle>
 
             <Material.DialogContent className={classes.flexContainer}>
-              
+
             </Material.DialogContent>
+
             <Material.DialogActions>
               <Material.Button onClick={this.editHide}>
                 Cancel
@@ -504,7 +455,22 @@ class Groups extends Component {
             </Material.DialogTitle>
 
             <Material.DialogContent className={classes.flexContainer}>
-              
+
+              <Material.FormControl className={classes.m4}
+                error={this.state.addErrors.name}>
+                <Material.InputLabel htmlFor="add-name-input">Name</Material.InputLabel>
+                <Material.Input
+                  id="add-name-input"
+                  value={this.state.addState.name}
+                  onChange={(e) => this.changeField(e, 'add', 'name')}
+                  aria-describedby="add-name-err"
+                />
+                <Material.FormHelperText id="add-name-err"
+                  className={classNames(this.state.addErrors.name ? classes.displayInherit : classes.displayNone)}>
+                  Name is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+
             </Material.DialogContent>
             <Material.DialogActions>
               <Material.Button onClick={this.addHide}>

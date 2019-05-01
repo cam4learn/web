@@ -201,7 +201,7 @@ class Rooms extends Component {
 			  room: this.state.addState.room
 		  });
 
-		  AuthorizedAxios.post("/api/admin/device", data)
+		  AuthorizedAxios().post("/api/admin/device", data)
 			  .then(response => {
 				  console.log(response.data);
 				  this.refresh();
@@ -260,7 +260,7 @@ class Rooms extends Component {
 			  room: this.state.editState.room
 		  });
 
-		  AuthorizedAxios.patch("/api/admin/device", data)
+		  AuthorizedAxios().patch("/api/admin/device", data)
 			  .then(response => {
 				  console.log(response.data);
 				  this.refresh();
@@ -295,7 +295,7 @@ class Rooms extends Component {
 		  id: this.state.currentDelete.id
 	  });
 
-	  AuthorizedAxios.delete("/api/admin/device", { data: data })
+	  AuthorizedAxios().delete("/api/admin/device", { data: data })
 		  .then(response => {
 			  console.log(response.data);
 			  this.refresh();
@@ -372,7 +372,7 @@ class Rooms extends Component {
 
   refresh() {
     console.log("refresh");
-    AuthorizedAxios.get("/api/admin/device")
+    AuthorizedAxios().get("/api/admin/device")
       .then(response => {
         console.log("Refresh");
         console.log(response);

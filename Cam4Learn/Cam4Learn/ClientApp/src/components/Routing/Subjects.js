@@ -214,7 +214,7 @@ class Subjects extends Component {
       id: this.state.currentDelete.id
     });
 
-    AuthorizedAxios.delete("/api/admin/deleteSubject", { data: data })
+    AuthorizedAxios().delete("/api/admin/deleteSubject", { data: data })
       .then(response => {
         console.log(response.data);
         this.refresh();
@@ -277,7 +277,7 @@ class Subjects extends Component {
       title: this.state.subjectName
     });
 
-    AuthorizedAxios.post("/api/admin/addSubject", data)
+    AuthorizedAxios().post("/api/admin/addSubject", data)
       .then(response => {
         console.log("Refresh");
         console.log(response);
@@ -318,13 +318,13 @@ class Subjects extends Component {
 
   refresh() {
     console.log("refresh");
-    AuthorizedAxios.get("/api/admin/getSubjects")
+    AuthorizedAxios().get("/api/admin/getSubjects")
       .then(response => {
         console.log("Refresh");
         console.log(response);
         this.setState({ data: response.data });
 
-        AuthorizedAxios.get("/api/lectors")
+        AuthorizedAxios().get("/api/lectors")
           .then(resp => {
             console.log("Lectors");
             console.log(resp);

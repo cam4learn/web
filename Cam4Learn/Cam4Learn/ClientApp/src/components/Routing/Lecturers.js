@@ -221,7 +221,7 @@ class Lecturers extends Component {
         password: this.state.addState.password
       });
 
-      AuthorizedAxios.post("/api/admin/addLector", data)
+      AuthorizedAxios().post("/api/admin/addLector", data)
         .then(response => {
           console.log(response.data);
           this.refresh();
@@ -288,7 +288,7 @@ class Lecturers extends Component {
         login: this.state.editState.login,
       });
 
-      AuthorizedAxios.patch("/api/admin/changeLector", data)
+      AuthorizedAxios().patch("/api/admin/changeLector", data)
         .then(response => {
           console.log(response.data);
           this.refresh();
@@ -323,7 +323,7 @@ class Lecturers extends Component {
       id: this.state.currentDelete.id
     });
 
-    AuthorizedAxios.delete("/api/admin/deleteLector", { data: data })
+    AuthorizedAxios().delete("/api/admin/deleteLector", { data: data })
       .then(response => {
         console.log(response.data);
         this.refresh();
@@ -409,7 +409,7 @@ class Lecturers extends Component {
 
   refresh() {
     console.log("refresh");
-    AuthorizedAxios.get("/api/admin/getLectors")
+    AuthorizedAxios().get("/api/admin/getLectors")
       .then(response => {
         console.log("Refresh");
         console.log(response);
