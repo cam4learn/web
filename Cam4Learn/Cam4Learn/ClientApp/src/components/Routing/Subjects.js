@@ -246,7 +246,7 @@ class Subjects extends Component {
       isEdit: false,
       subjectName: '',
       editAddOpen: true,
-      lectorId: 0
+      lectorId: (this.state.lecturers[0] || {}).id
     });
   }
 
