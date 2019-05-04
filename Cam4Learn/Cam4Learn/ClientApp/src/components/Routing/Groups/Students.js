@@ -144,10 +144,10 @@ class Students extends Component {
 
       editOpen: false,
       editState: {
-        id: 0,
+        id: -1,
         name: '',
         surname: '',
-        group: ''
+        groupId: -1
       },
       editErrors: {
         name: false,
@@ -157,10 +157,10 @@ class Students extends Component {
 
       addOpen: false,
       addState: {
-        id: 0,
+        id: -1,
         name: '',
         surname: '',
-        group: ''
+        groupId: -1
       },
       addErrors: {
         name: false,
@@ -180,6 +180,9 @@ class Students extends Component {
   addShow = () => {
     this.setState({
       addOpen: true,
+      addState: {
+        groupId: (this.state.groups[0] || {}).id,
+      }
     });
   }
 
@@ -189,7 +192,7 @@ class Students extends Component {
       addState: {
         name: '',
         surname: '',
-        group: ''
+        groupId: -1
       },
       addErrors: {
         name: false,
@@ -209,7 +212,7 @@ class Students extends Component {
       this.setState(prev => ({ addErrors: { ...prev.addErrors, surname: true } }));
       err = true;
     }
-    if (!this.state.addState.group) {
+    if (!this.state.addState.groupId) {
       this.setState(prev => ({ addErrors: { ...prev.addErrors, group: true } }));
       err = true;
     }
@@ -218,7 +221,7 @@ class Students extends Component {
       let data = JSON.stringify({
         name: this.state.addState.name,
         surname: this.state.addState.surname,
-        groupId: this.state.groups.find(x => x.name === this.state.addState.group).id
+        groupId: this.state.addState.groupId
       });
 
       AuthorizedAxios().post("/api/admin/student", data)
@@ -239,9 +242,10 @@ class Students extends Component {
     this.setState({
       editOpen: true,
       editState: {
+        id: obj.id,
         name: obj.name,
         surname: obj.surname,
-        group: obj.group,
+        groupId: this.state.groups.find(x => x.name === obj.group).id,
       },
     });
   }
@@ -250,38 +254,41 @@ class Students extends Component {
     this.setState({
       editOpen: false,
       editState: {
+        id: -1,
         name: '',
         surname: '',
-        group: '',
+        groupId: -1,
       },
       editErrors: {
         name: false,
         surname: false,
-        group: false,
+        // group: false,
       }
     });
   }
 
   editSubmit = () => {
     let err = false;
+    console.log('edit submit', this.state.editState);
     if (!this.state.editState.name) {
-      this.setState(prev => ({ editState: { ...prev.editState, name: true } }));
+      this.setState(prev => ({ editErrors: { ...prev.editErrors, name: true } }));
       err = true;
     }
     if (!this.state.editState.surname) {
-      this.setState(prev => ({ editState: { ...prev.editState, surname: true } }));
+      this.setState(prev => ({ editErrors: { ...prev.editErrors, surname: true } }));
       err = true;
     }
-    if (!this.state.editState.group) {
-      this.setState(prev => ({ editState: { ...prev.editState, group: true } }));
-      err = true;
-    }
+    // if (!this.state.editState.group) {
+    //   this.setState(prev => ({ editState: { ...prev.editState, group: true } }));
+    //   err = true;
+    // }
 
     if (!err) {
       const data = JSON.stringify({
+        id: this.state.editState.id,
         name: this.state.editState.name,
         surname: this.state.editState.surname,
-        groupId: this.state.groups.find(x => x.name === this.state.editState.group).id
+        groupId: this.state.editState.groupId,//this.state.groups.find(x => x.name === this.state.editState.group).id
       });
 
       AuthorizedAxios().patch("/api/admin/student", data)
@@ -312,13 +319,19 @@ class Students extends Component {
     });
   }
 
-  deleteLecturer = () => {
-    console.log("deleteSubject");
-    console.log(this.state.currentDelete);
-    const data = JSON.stringify({
-      id: this.state.currentDelete.id
-    });
-
+  deleteStudent = () => {
+    console.log('delete', this.state.currentDelete);
+    AuthorizedAxios().delete("/api/admin/student", { params: { id: this.state.currentDelete.id } })
+      .then(response => {
+        console.log(response.data);
+        this.refresh();
+      })
+      .catch(error => {
+        console.log(error);
+      })
+      .then(() => {
+        this.deleteHide();
+      });
 
   }
 
@@ -334,8 +347,8 @@ class Students extends Component {
           case 'surname':
             this.setState(prev => ({ editState: { ...prev.editState, surname: value } }));
             break;
-          case 'group':
-            this.setState(prev => ({ editState: { ...prev.editState, group: value } }));
+          case 'groupId':
+            this.setState(prev => ({ editState: { ...prev.editState, groupId: value } }));
             break;
         }
         break;
@@ -347,8 +360,8 @@ class Students extends Component {
           case 'surname':
             this.setState(prev => ({ addState: { ...prev.addState, surname: value } }));
             break;
-          case 'group':
-            this.setState(prev => ({ addState: { ...prev.addState, group: value } }));
+          case 'groupId':
+            this.setState(prev => ({ addState: { ...prev.addState, groupId: value } }));
             break;
         }
     }
@@ -460,7 +473,7 @@ class Students extends Component {
 
             <Material.DialogContent>
               <Material.DialogContentText>
-                {"Are you sure you want to delete this group?"}
+                {"Are you sure you want to delete this student?"}
               </Material.DialogContentText>
             </Material.DialogContent>
             <Material.DialogActions>
@@ -468,7 +481,7 @@ class Students extends Component {
                 Cancel
               </Material.Button>
               <Material.Button
-                onClick={this.deleteLecturer}
+                onClick={this.deleteStudent}
                 className={this.classes.foregroundDanger}
                 autoFocus>
                 Delete
@@ -527,12 +540,28 @@ class Students extends Component {
                 <Material.InputLabel htmlFor="add-group-input">
                   Group
                 </Material.InputLabel>
-                <Material.Input
+                <Material.Select
                   id="add-group-input"
-                  value={this.state.addState.group}
-                  onChange={(e) => this.changeField(e, 'add', 'group')}
-                  aria-describedby="add-group-err">
-                </Material.Input>
+                  value={this.state.addState.groupId}
+                  onChange={(e) => this.changeField(e, 'add', 'groupId')}>
+                  {
+                    this.state.groups.map((obj) => {
+                      console.log("Render group select");
+                      console.log(obj);
+                      return (
+                        <Material.MenuItem key={obj.id} value={obj.id}>
+                          {obj.name}
+                        </Material.MenuItem>
+                      )
+                    })
+                  }
+                </Material.Select>
+                {/*<Material.Input*/}
+                  {/*id="add-group-input"*/}
+                  {/*value={this.state.addState.group}*/}
+                  {/*onChange={(e) => this.changeField(e, 'add', 'group')}*/}
+                  {/*aria-describedby="add-group-err">*/}
+                {/*</Material.Input>*/}
                 <Material.FormHelperText id="add-group-err"
                                          className={classNames(this.state.addErrors.group ? this.classes.displayInherit : this.classes.displayNone)}>
                   Group is required
@@ -604,12 +633,28 @@ class Students extends Component {
                 <Material.InputLabel htmlFor="edit-group-input">
                   Group
                 </Material.InputLabel>
-                <Material.Input
+                <Material.Select
                   id="edit-group-input"
-                  value={this.state.editState.group}
-                  onChange={(e) => this.changeField(e, 'edit', 'group')}
-                  aria-describedby="edit-group-err">
-                </Material.Input>
+                  value={this.state.editState.groupId}
+                  onChange={(e) => this.changeField(e, 'edit', 'groupId')}>
+                  {
+                    this.state.groups.map((obj) => {
+                      console.log("Render group select");
+                      console.log(obj);
+                      return (
+                        <Material.MenuItem key={obj.id} value={obj.id}>
+                          {obj.name}
+                        </Material.MenuItem>
+                      )
+                    })
+                  }
+                </Material.Select>
+                {/*<Material.Input*/}
+                  {/*id="edit-group-input"*/}
+                  {/*value={this.state.editState.group}*/}
+                  {/*onChange={(e) => this.changeField(e, 'edit', 'group')}*/}
+                  {/*aria-describedby="edit-group-err">*/}
+                {/*</Material.Input>*/}
                 <Material.FormHelperText id="edit-group-err"
                                          className={classNames(this.state.editErrors.group ? this.classes.displayInherit : this.classes.displayNone)}>
                   Group is required

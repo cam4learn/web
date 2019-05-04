@@ -263,14 +263,9 @@ class Groups extends Component {
   }
 
   deleteGroup = () => {
-	console.log("deleteGroup");
-	console.log(this.state.currentDelete);
-	var data = JSON.stringify({
-		id: this.state.currentDelete.id
-	});
-
-	  console.log(data);
-	  AuthorizedAxios().delete("/api/admin/group", { data: data })
+    console.log("deleteGroup");
+    console.log(this.state.currentDelete);
+	  AuthorizedAxios().delete("/api/admin/group", { params: { id: this.state.currentDelete.id } })
 		.then(response => {
 			console.log(response.data);
 			this.refresh();
