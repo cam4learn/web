@@ -415,35 +415,6 @@ class Groups extends Component {
 
           <Material.Dialog
             fullScreen={fullScreen}
-            open={this.state.editOpen}
-            onClose={this.editHide}
-            maxWidth='sm'
-            fullWidth={true}
-            aria-labelledby="responsive-dialog-title">
-
-            <Material.DialogTitle id="responsive-dialog-title">
-              Group edit
-            </Material.DialogTitle>
-
-            <Material.DialogContent className={classes.flexContainer}>
-
-            </Material.DialogContent>
-
-            <Material.DialogActions>
-              <Material.Button onClick={this.editHide}>
-                Cancel
-              </Material.Button>
-              <Material.Button
-                onClick={this.editSubmit}
-                className={classes.foregroundDanger}
-                autoFocus>
-                Submit
-              </Material.Button>
-            </Material.DialogActions>
-          </Material.Dialog>
-
-          <Material.Dialog
-            fullScreen={fullScreen}
             open={this.state.addOpen}
             maxWidth='sm'
             fullWidth={true}
@@ -478,6 +449,48 @@ class Groups extends Component {
               </Material.Button>
               <Material.Button
                 onClick={this.addSubmit}
+                className={classes.foregroundDanger}
+                autoFocus>
+                Submit
+              </Material.Button>
+            </Material.DialogActions>
+          </Material.Dialog>
+
+          <Material.Dialog
+            fullScreen={fullScreen}
+            open={this.state.editOpen}
+            onClose={this.editHide}
+            maxWidth='sm'
+            fullWidth={true}
+            aria-labelledby="responsive-dialog-title">
+
+            <Material.DialogTitle id="responsive-dialog-title">
+              Group edit
+            </Material.DialogTitle>
+
+            <Material.DialogContent className={classes.flexContainer}>
+              <Material.FormControl className={classes.m4}
+                                    error={this.state.editErrors.name}>
+                <Material.InputLabel htmlFor="edit-name-input">Name</Material.InputLabel>
+                <Material.Input
+                  id="edit-name-input"
+                  value={this.state.editState.name}
+                  onChange={(e) => this.changeField(e, 'edit', 'name')}
+                  aria-describedby="edit-name-err"
+                />
+                <Material.FormHelperText id="edit-name-err"
+                                         className={classNames(this.state.editErrors.name ? classes.displayInherit : classes.displayNone)}>
+                  Name is required
+                </Material.FormHelperText>
+              </Material.FormControl>
+            </Material.DialogContent>
+
+            <Material.DialogActions>
+              <Material.Button onClick={this.editHide}>
+                Cancel
+              </Material.Button>
+              <Material.Button
+                onClick={this.editSubmit}
                 className={classes.foregroundDanger}
                 autoFocus>
                 Submit
