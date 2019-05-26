@@ -141,6 +141,7 @@ class Export extends Component {
   refresh() {
     UnauthorizedAxios.get("/subjectStatisticJson?subjectId=7")
       .then(response => {
+        console.log(response.data);
         this.setState({ data: response.data[0].attendanceList });
       }).catch(error => {
         console.log(error);

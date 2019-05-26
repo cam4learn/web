@@ -71,7 +71,10 @@ class Login extends Component {
       passError: false,
       login: '',
       password: '',
-      showPassword: false
+      showPassword: false,
+
+      loginErrText: 'Login is required',
+      passErrText: 'Password is required'
     };
 
     this.submit = this.submit.bind(this);
@@ -81,13 +84,14 @@ class Login extends Component {
 
   render() {
     let token = localStorage.getItem(this.props.tknKey);
+    let state = this.state;
 
     if (token != null)
       return (<Redirect to="/lectures" />);
     else
       return (
         <Material.Grid container direction="column" justify="center" alignItems="center" className={this.classes.flexContainer}>
-          <Material.FormControl className={classNames(this.classes.containerWrap, this.classes.w33)} error={this.state.loginError}>
+          <Material.FormControl className={classNames(this.classes.containerWrap, this.classes.w33)} error={state.loginError}>
             <Material.InputLabel htmlFor="login-input">Login</Material.InputLabel>
             <Material.Input
               id="login-input"
@@ -95,32 +99,32 @@ class Login extends Component {
               aria-describedby="login-input-err"
             />
             <Material.FormHelperText id="login-input-err"
-              className={classNames(this.state.loginError ? this.classes.displayInherit : this.classes.displayNone)}>
-              Invalid login
+              className={classNames(state.loginError ? this.classes.displayInherit : this.classes.displayNone)}>
+              {state.loginErrText}
             </Material.FormHelperText>
           </Material.FormControl>
 
-          <Material.FormControl className={classNames(this.classes.containerWrap, this.classes.w33)} error={this.state.passError}>
+          <Material.FormControl className={classNames(this.classes.containerWrap, this.classes.w33)} error={state.passError}>
             <Material.InputLabel htmlFor="pass-input">Password</Material.InputLabel>
             <Material.Input
               id="pass-input"
               onChange={(e) => this.onChangeInput('password', e)}
               aria-describedby="pass-input-err"
-              type={this.state.showPassword ? 'text' : 'password'}
+              type={state.showPassword ? 'text' : 'password'}
               endAdornment={
                 <Material.InputAdornment position="end">
                   <Material.IconButton
                     aria-label="Toggle password visibility"
                     onClick={this.handleClickShowPassword}
                   >
-                    {this.state.showPassword ? <Icons.Visibility /> : <Icons.VisibilityOff />}
+                    {state.showPassword ? <Icons.Visibility /> : <Icons.VisibilityOff />}
                   </Material.IconButton>
                 </Material.InputAdornment>
               }
             />
             <Material.FormHelperText id="pass-input-err"
-              className={classNames(this.state.passError ? this.classes.displayInherit : this.classes.displayNone)}>
-              Invalid password
+              className={classNames(state.passError ? this.classes.displayInherit : this.classes.displayNone)}>
+              {state.passErrText}
             </Material.FormHelperText>
           </Material.FormControl>
 
@@ -140,12 +144,12 @@ class Login extends Component {
     let err = false;
 
     if (this.state.login == '') {
-      this.setState({ loginError: true });
+      this.setState({ loginError: true, loginErrText: "Login is required" });
       err = true;
     }
 
     if (this.state.password.length < 6) {
-      this.setState({ passError: true });
+      this.setState({ passError: true, passErrText: "Password is required" });
       err = true;
     }
 
@@ -160,8 +164,8 @@ class Login extends Component {
         this.props.authCallback(true);
         }).catch((error) => {
           if (error.response) {
-            if (error.response.status == 400) {
-              this.setState({ loginError: true });
+            if (error.response.status == 401) {
+              this.setState({ passError: true, passErrText: "Incorrect login or password" });
             }
           } else if (error.request) {
             console.log(error.request);

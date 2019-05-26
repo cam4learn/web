@@ -230,7 +230,7 @@ class CustomizableTable extends React.Component {
           </Material.Table>
         </div>
         <Material.TablePagination
-          rowsPerPageOptions={[5, 10, 20]}
+          rowsPerPageOptions={[5, 10]}
           component="div"
           count={data.length}
           rowsPerPage={rowsPerPage}
